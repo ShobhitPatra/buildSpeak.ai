@@ -7,13 +7,13 @@ import { BASE_PROMPT as NEXT_PROMPT } from "../prompts/next";
 
 export const templateController = async (req: Request, res: Response) => {
   try {
-    const userPrompt = req.body;
+    const userPrompt = req.body.prompt;
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY?.trim()}`,
           // "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
           "X-Title": "BuildSpeak", // Optional. Site title for rankings on openrouter.ai.
           "Content-Type": "application/json",
@@ -39,26 +39,17 @@ export const templateController = async (req: Request, res: Response) => {
     );
     const result = await response.json();
     const stack = result.choices[0].message.content as string;
-    console.log(stack);
-    if (stack.trim().toLocaleLowerCase() === "node") {
-      res.status(200).json({
-        systemPrompt: getSystemPrompt(),
-        basePrompt: NODE_PROMPT,
-        userPrompt,
-      });
-    } else if (stack.trim().toLowerCase() === "react") {
-      res.status(200).json({
-        systemPrompt: getSystemPrompt(),
-        basePrompt: REACT_PROMPT,
-        userPrompt,
-      });
-    } else {
-      res.status(200).json({
-        systemPrompt: getSystemPrompt(),
-        basePrompt: NEXT_PROMPT,
-        userPrompt,
-      });
-    }
+    const basePrompt =
+      stack.trim().toLocaleLowerCase() === "node"
+        ? NODE_PROMPT
+        : stack.trim().toLowerCase() === "react"
+        ? REACT_PROMPT
+        : NEXT_PROMPT;
+
+    res.status(200).json({
+      basePrompt,
+      userPrompt,
+    });
   } catch (error) {
     console.log(error);
     res.status(400).json("INTERNAL SEVER ERROR");

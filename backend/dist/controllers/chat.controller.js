@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.chatController = void 0;
+const prompts_1 = require("../prompts");
 const chatController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const { userPrompt, systemPrompt, basePrompt } = req.body;
     const response = yield fetch("https://openrouter.ai/api/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -26,15 +26,15 @@ const chatController = (req, res) => __awaiter(void 0, void 0, void 0, function*
             messages: [
                 {
                     role: "user",
-                    content: systemPrompt,
+                    content: (0, prompts_1.getSystemPrompt)(),
                 },
                 {
                     role: "user",
-                    content: basePrompt,
+                    content: req.body.basePrompt,
                 },
                 {
                     role: "user",
-                    content: userPrompt.prompt,
+                    content: req.body.userPrompt,
                 },
             ],
         }),

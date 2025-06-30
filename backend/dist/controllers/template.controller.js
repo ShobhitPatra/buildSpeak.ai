@@ -12,15 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.templateController = void 0;
 const node_1 = require("../prompts/node");
 const react_1 = require("../prompts/react");
-const prompts_1 = require("../prompts");
 const next_1 = require("../prompts/next");
 const templateController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const userPrompt = req.body;
+        const userPrompt = req.body.prompt;
         const response = yield fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",
             headers: {
-                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                Authorization: `Bearer ${(_a = process.env.OPENROUTER_API_KEY) === null || _a === void 0 ? void 0 : _a.trim()}`,
                 // "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
                 "X-Title": "BuildSpeak",
                 "Content-Type": "application/json",
@@ -45,28 +45,15 @@ const templateController = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
         const result = yield response.json();
         const stack = result.choices[0].message.content;
-        console.log(stack);
-        if (stack.trim().toLocaleLowerCase() === "node") {
-            res.status(200).json({
-                systemPrompt: (0, prompts_1.getSystemPrompt)(),
-                basePrompt: node_1.BASE_PROMPT,
-                userPrompt,
-            });
-        }
-        else if (stack.trim().toLowerCase() === "react") {
-            res.status(200).json({
-                systemPrompt: (0, prompts_1.getSystemPrompt)(),
-                basePrompt: react_1.BASE_PROMPT,
-                userPrompt,
-            });
-        }
-        else {
-            res.status(200).json({
-                systemPrompt: (0, prompts_1.getSystemPrompt)(),
-                basePrompt: next_1.BASE_PROMPT,
-                userPrompt,
-            });
-        }
+        const basePrompt = stack.trim().toLocaleLowerCase() === "node"
+            ? node_1.BASE_PROMPT
+            : stack.trim().toLowerCase() === "react"
+                ? react_1.BASE_PROMPT
+                : next_1.BASE_PROMPT;
+        res.status(200).json({
+            basePrompt,
+            userPrompt,
+        });
     }
     catch (error) {
         console.log(error);
