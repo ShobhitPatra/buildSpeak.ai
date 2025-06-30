@@ -15,7 +15,8 @@
     "dotenv": "^17.0.0",
     "eventsource-parser": "^3.0.3",
     "express": "^5.1.0",
-    "openai": "^5.8.2"
+    "openai": "^5.8.2",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@types/node": "^24.0.7"

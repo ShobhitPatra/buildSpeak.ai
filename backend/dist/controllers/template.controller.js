@@ -13,9 +13,14 @@ exports.templateController = void 0;
 const node_1 = require("../prompts/node");
 const react_1 = require("../prompts/react");
 const next_1 = require("../prompts/next");
+const schema_1 = require("../schema");
 const templateController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
+        const { success } = schema_1.templateSchema.safeParse(req.body);
+        if (!success) {
+            res.status(400).json({ msg: "INVALID INPUTS" });
+        }
         const userPrompt = req.body.prompt;
         const response = yield fetch("https://openrouter.ai/api/v1/chat/completions", {
             method: "POST",

@@ -1,12 +1,16 @@
 import { Request, Response } from "express";
 import { BASE_PROMPT as NODE_PROMPT } from "../prompts/node";
 import { BASE_PROMPT as REACT_PROMPT } from "../prompts/react";
-
-import { getSystemPrompt } from "../prompts";
 import { BASE_PROMPT as NEXT_PROMPT } from "../prompts/next";
+import { getSystemPrompt } from "../prompts";
+import { templateSchema } from "../schema";
 
 export const templateController = async (req: Request, res: Response) => {
   try {
+    const { success } = templateSchema.safeParse(req.body);
+    if (!success) {
+      res.status(400).json({ msg: "INVALID INPUTS" });
+    }
     const userPrompt = req.body.prompt;
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",

@@ -1,8 +1,13 @@
 import { Response, Request } from "express";
 import { getSystemPrompt } from "../prompts";
+import { chatSchema } from "../schema";
 
 export const chatController = async (req: Request, res: Response) => {
   try {
+    const { success } = chatSchema.safeParse(req.body);
+    if (!success) {
+      res.status(400).json({ msg: "INVALID INPUTS" });
+    }
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
       {
